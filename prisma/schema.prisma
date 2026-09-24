@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Auth (NextAuth) models ───────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String? // hashed, for credentials login
+  emailVerified DateTime?
+  image         String?
+
+  accounts     Account[]
+  sessions     Session[]
+  chatSessions ChatSession[]
+  notes        Note[]
+  quizzes      Quiz[]
+  studyPlans   StudyPlan[]
+
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── App models ────────────────────────────────────────────
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+model ChatSession {
+  id         String     @id @default(cuid())
+  userId     String
+  topic      String
+  difficulty Difficulty @default(BEGINNER)
+  createdAt  DateTime   @default(now())
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages Message[]
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  chatSessionId String
+  role          String // "user" | "assistant"
+  content       String   @db.Text
+  createdAt     DateTime @default(now())
+
+  chatSession ChatSession @relation(fields: [chatSessionId], references: [id], onDelete: Cascade)
+}
+
+model Note {
+  id         String     @id @default(cuid())
+  userId     String
+  topic      String
+  content    String     @db.Text
+  difficulty Difficulty @default(BEGINNER)
+  createdAt  DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Quiz {
+  id         String     @id @default(cuid())
+  userId     String
+  topic      String
+  difficulty Difficulty @default(BEGINNER)
+  questions  Json // array of { question, options[4], correctIndex, explanation }
+  createdAt  DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model StudyPlan {
+  id         String     @id @default(cuid())
+  userId     String
+  topic      String
+  content    String     @db.Text
+  difficulty Difficulty @default(BEGINNER)
+  createdAt  DateTime   @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

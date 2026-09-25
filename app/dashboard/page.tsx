@@ -5,6 +5,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Sparkles, Plus, FileText, HelpCircle, LogOut, Calendar, MessageSquare, ArrowRight } from "lucide-react";
+import AuthSocialButtons from "@/components/AuthSocialButtons";
 
 type Note = { id: string; topic: string; createdAt: string; difficulty: string };
 type Quiz = { id: string; topic: string; createdAt: string; difficulty: string };
@@ -110,6 +111,14 @@ export default function DashboardPage() {
           <Plus size={20} />
           Start a new study session
         </Link>
+
+        <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-5 mb-8">
+          <h2 className="text-lg font-bold text-white mb-1">Connect a sign-in method</h2>
+          <p className="text-sm text-zinc-500 mb-4">
+            You are signed in securely. Connect Google or GitHub now so you can use it next time without weakening account security.
+          </p>
+          <AuthSocialButtons />
+        </section>
 
         <h2 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
           <FileText size={18} className="text-violet-400" />

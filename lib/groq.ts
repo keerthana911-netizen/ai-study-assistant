@@ -44,7 +44,9 @@ async function callGroq(messages: GroqMessage[], jsonMode = false, quizCount = 5
     model: MODEL,
     messages,
     temperature: jsonMode ? 0.1 : 0.3,
-    max_completion_tokens: jsonMode ? 1400 : 1100,
+    // 1,100 tokens cut longer notes and plans off mid-response. Keep enough
+    // room for a complete answer while staying reasonable for the free tier.
+    max_completion_tokens: jsonMode ? 2000 : 2000,
     ...(IS_GPT_OSS ? { reasoning_effort: "low", ...(jsonMode ? { reasoning_format: "hidden" } : {}) } : {}),
   };
 
@@ -114,7 +116,7 @@ export async function generateExplanation(topic: string, difficulty: string): Pr
   return callGroq([
     {
       role: "system",
-      content: `You are a patient, clear tutor. Explain topics at a ${difficulty.toLowerCase()} level. Keep explanations focused and well-structured with short paragraphs.`,
+      content: `You are a patient, clear tutor. Explain topics at a ${difficulty.toLowerCase()} level. Give a complete answer with short paragraphs and simple headings. Do not stop mid-sentence, do not use Markdown tables, and do not output raw pipe characters or horizontal-rule lines.`,
     },
     { role: "user", content: `Explain: ${topic}` },
   ]);
@@ -124,7 +126,7 @@ export async function generateNotes(topic: string, difficulty: string): Promise<
   return callGroq([
     {
       role: "system",
-      content: `You create concise, well-organized study notes at a ${difficulty.toLowerCase()} level. Use markdown headers and bullet points. Keep it scannable, not a wall of text.`,
+      content: `You create complete, well-organized study notes at a ${difficulty.toLowerCase()} level. Use simple headings and bullet points only. Do not use Markdown tables, raw pipe characters, backslash escapes, or horizontal-rule lines. Finish every section and never stop mid-sentence.`,
     },
     { role: "user", content: `Create study notes for: ${topic}` },
   ]);
@@ -146,7 +148,7 @@ export async function generateQuiz(
     [
       {
         role: "system",
-        content: `Generate exactly ${count} multiple-choice questions about the requested topic at a ${difficulty.toLowerCase()} level. Return only the JSON object matching the provided schema. Do not include markdown, commentary, or extra keys.`,
+        content: `Generate exactly ${count} multiple-choice questions about the requested topic at a ${difficulty.toLowerCase()} level. Return only the JSON object matching the provided schema. Do not include markdown, commentary, or extra keys. Complete every question and explanation.`,
       },
       { role: "user", content: `Topic: ${topic}` },
     ],
@@ -189,7 +191,7 @@ export async function generateStudyPlan(
   return callGroq([
     {
       role: "system",
-      content: `You create realistic, day-by-day study plans at a ${difficulty.toLowerCase()} level. Be specific about what to study each day, not generic advice. Use markdown.`,
+      content: `You create a complete, realistic day-by-day study plan at a ${difficulty.toLowerCase()} level. Be specific about what to study each day, resources, practice, and review. Use simple headings and bullet points, not tables. Do not use raw pipe characters, backslash escapes, or horizontal-rule lines. Finish every day and never stop mid-sentence.`,
     },
     {
       role: "user",

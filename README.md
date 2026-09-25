@@ -1,11 +1,15 @@
 🧠 AI Study Assistant
 
+**Live Demo:** https://ai-study-assistant-kohl-eight.vercel.app
+
+**Repository:** https://github.com/keerthana911-netizen/ai-study-assistant
+
 A full-stack AI-powered study assistant. Enter any topic and get instant explanations, concise study notes, auto-generated quizzes, and a personalized study plan — tailored to your chosen difficulty level.
 
 ✨ Features
 
 - User registration and login (credentials-based auth via NextAuth)
-- Google and GitHub OAuth sign-in buttons (optional provider credentials)
+- Google and GitHub OAuth sign-in with secure account linking
 - AI-powered topic explanations
 - Auto-generated study notes (markdown-formatted)
 - Auto-generated multiple-choice quizzes with instant grading and explanations
@@ -55,7 +59,7 @@ ai-study-assistant/
 1. Clone and install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/keerthana911-netizen/ai-study-assistant.git
 cd ai-study-assistant
 npm install
 ```
@@ -84,14 +88,16 @@ GOOGLE_CLIENT_ID="your-google-client-id"
 GOOGLE_CLIENT_SECRET="your-google-client-secret"
 ```
 
-Google OAuth is optional for local development. When enabled, use
+For local Google OAuth, use
 `http://localhost:3000/api/auth/callback/google` as the callback URL. For
-Vercel, add the equivalent callback URL for your deployed domain.
+production, use
+`https://ai-study-assistant-kohl-eight.vercel.app/api/auth/callback/google`.
+Public legal pages are available at `/privacy` and `/terms`.
 
 5. Set up the database
 
 ```bash
-npx prisma generate
+npm run db:generate
 npx prisma migrate dev --name init
 ```
 
@@ -123,7 +129,7 @@ Deployed on Vercel (single deployment for both frontend and API routes — no se
 3. Add the same environment variables in Vercel's project settings
 4. Deploy — Vercel runs `prisma generate` automatically via the build step
 
-**Live Demo:** _(add your Vercel URL here after deploying)_
+**Live Demo:** https://ai-study-assistant-kohl-eight.vercel.app
 
 **60-second demo flow:** create an account (or use Google), explain a topic,
 generate notes, complete a quiz, generate a study plan, and open the dashboard
